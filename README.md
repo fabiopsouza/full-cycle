@@ -8,4 +8,4 @@
 Challenge | Docker Image | Repository
 :--: | :--: | :--: 
 Go | [fabsouza/go](https://hub.docker.com/r/fabsouza/go) | [Go](https://github.com/fabiopsouza/full-cycle/tree/main/docker/go)
-Nginx com Node.js | Developing | Developing
+Nginx com Node.js | N/A | [Nginx com Node.js](https://github.com/fabiopsouza/full-cycle/tree/main/docker/nginx-node

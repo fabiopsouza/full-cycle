@@ -3,6 +3,3 @@
 
 #Node
 /**/node_modules/**/
-
-#MySQL
-nginx-node/mysql
