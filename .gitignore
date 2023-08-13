@@ -1,1 +1,8 @@
+#Pre-commit
 .pre-commit-config.yaml
+
+#Node
+/**/node_modules/**/
+
+#MySQL
+nginx-node/mysql
