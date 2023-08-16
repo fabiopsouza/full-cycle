@@ -17,7 +17,7 @@ services:
     build:
       context: node
     container_name: app
-    entrypoint: ./wait-for-it.sh db:3306 -t 20 -s -- node index.js
+    entrypoint: ./wait-for-it.sh db:3306 -t 20 -s -- sh -c "npm install && node index.js"
     networks:
       - node-network
     volumes:
