@@ -2,7 +2,13 @@ module github.com/devfullcycle/fcutils
 
 go 1.20
 
-require github.com/stretchr/testify v1.8.4
+require (
+	github.com/confluentinc/confluent-kafka-go v1.9.2
+	github.com/go-sql-driver/mysql v1.7.1
+	github.com/google/uuid v1.3.1
+	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/stretchr/testify v1.8.4
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
