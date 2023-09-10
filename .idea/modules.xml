@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/fcutils.iml" filepath="$PROJECT_DIR$/.idea/fcutils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/full-cycle.iml" filepath="$PROJECT_DIR$/.idea/full-cycle.iml" />
     </modules>
   </component>
 </project>

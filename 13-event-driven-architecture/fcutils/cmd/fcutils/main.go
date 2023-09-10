@@ -4,6 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/devfullcycle/fcutils/internal/event"
+	"github.com/devfullcycle/fcutils/internal/usecase/create_account"
+	"github.com/devfullcycle/fcutils/internal/usecase/create_client"
+	"github.com/devfullcycle/fcutils/internal/usecase/create_transaction"
+	"github.com/devfullcycle/fcutils/internal/web"
+	"github.com/devfullcycle/fcutils/internal/web/webserver"
+	"github.com/devfullcycle/fcutils/pkg/events"
 
 	"github.com/devfullcycle/fcutils/internal/database"
 	"github.com/devfullcycle/fcutils/pkg/uow"
@@ -23,14 +30,14 @@ func main() {
 	//}
 	//kafkaProducer := kafka.NewKafkaProducer(&configMap)
 
-	//eventDispatcher := events.NewEventDispatcher()
+	eventDispatcher := events.NewEventDispatcher()
 	//eventDispatcher.Register("TransactionCreated", handler.NewTransactionCreatedKafkaHandler(kafkaProducer))
 	//eventDispatcher.Register("BalanceUpdated", handler.NewUpdateBalanceKafkaHandler(kafkaProducer))
-	//transactionCreatedEvent := event.NewTransactionCreated()
-	//balanceUpdatedEvent := event.NewBalanceUpdated()
-	//
-	//clientDb := database.NewClientDB(db)
-	//accountDb := database.NewAccountDB(db)
+	transactionCreatedEvent := event.NewTransactionCreated()
+	balanceUpdatedEvent := event.NewBalanceUpdated()
+
+	clientDb := database.NewClientDB(db)
+	accountDb := database.NewAccountDB(db)
 
 	ctx := context.Background()
 	uow := uow.NewUow(ctx, db)
@@ -42,20 +49,21 @@ func main() {
 	uow.Register("TransactionDB", func(tx *sql.Tx) interface{} {
 		return database.NewTransactionDB(db)
 	})
-	//createTransactionUseCase := create_transaction.NewCreateTransactionUseCase(uow, eventDispatcher, transactionCreatedEvent, balanceUpdatedEvent)
-	//createClientUseCase := create_client.NewCreateClientUseCase(clientDb)
-	//createAccountUseCase := createaccount.NewCreateAccountUseCase(accountDb, clientDb)
 
-	//webserver := webserver.NewWebServer(":8080")
-	//
-	//clientHandler := web.NewWebClientHandler(*createClientUseCase)
-	//accountHandler := web.NewWebAccountHandler(*createAccountUseCase)
-	//transactionHandler := web.NewWebTransactionHandler(*createTransactionUseCase)
-	//
-	//webserver.AddHandler("/clients", clientHandler.CreateClient)
-	//webserver.AddHandler("/accounts", accountHandler.CreateAccount)
-	//webserver.AddHandler("/transactions", transactionHandler.CreateTransaction)
+	createClientUseCase := create_client.NewCreateClientUseCase(clientDb)
+	createAccountUseCase := create_account.NewCreateAccountUseCase(accountDb, clientDb)
+	createTransactionUseCase := create_transaction.NewCreateTransactionUseCase(uow, eventDispatcher, transactionCreatedEvent, balanceUpdatedEvent)
+
+	webserver := webserver.NewWebServer(":3000")
+
+	clientHandler := web.NewWebClientHandler(*createClientUseCase)
+	accountHandler := web.NewWebAccountHandler(*createAccountUseCase)
+	transactionHandler := web.NewWebTransactionHandler(*createTransactionUseCase)
+
+	webserver.AddHandler("/clients", clientHandler.CreateClient)
+	webserver.AddHandler("/accounts", accountHandler.CreateAccount)
+	webserver.AddHandler("/transactions", transactionHandler.CreateTransaction)
 
 	fmt.Println("Server is running")
-	//webserver.Start()
+	webserver.Start()
 }
