@@ -3,28 +3,28 @@ package event
 import "time"
 
 type BalanceUpdated struct {
-    Name string
-    Payload interface{}
+	Name    string
+	Payload interface{}
 }
 
 func NewBalanceUpdated() *BalanceUpdated {
-    return &BalanceUpdated{
-        Name: "BalanceUpdated",
-    }
+	return &BalanceUpdated{
+		Name: "BalanceUpdated",
+	}
 }
 
 func (e *BalanceUpdated) GetName() string {
-    return e.Name
+	return e.Name
 }
 
 func (e *BalanceUpdated) GetPayload() interface{} {
-    return e.Payload
+	return e.Payload
 }
 
 func (e *BalanceUpdated) SetPayload(payload interface{}) {
-    e.Payload = payload
+	e.Payload = payload
 }
 
 func (e *BalanceUpdated) GetDateTime() time.Time {
-    return time.Now()
+	return time.Now()
 }
