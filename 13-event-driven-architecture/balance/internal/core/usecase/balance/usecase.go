@@ -17,6 +17,10 @@ func NewUseCase(repository balancePort.Repository) balancePort.UseCase {
 	}
 }
 
+func (h UseCaseHandler) List() ([]balance.Model, error) {
+	return h.repository.List()
+}
+
 func (h UseCaseHandler) Save(msg []byte) error {
 	var balanceEvent balance.UpdateEvent
 

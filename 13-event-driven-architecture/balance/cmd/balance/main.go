@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/fabiopsouza/balance/internal/core/usecase/balance"
+	balanceUseCase "github.com/fabiopsouza/balance/internal/core/usecase/balance"
+	"github.com/fabiopsouza/balance/internal/platform/adapters/inbound/balance"
+	balanceOutboundAdapter "github.com/fabiopsouza/balance/internal/platform/adapters/outbound/balance"
 	"github.com/fabiopsouza/balance/internal/platform/kafka"
-
-	balanceAdapter "github.com/fabiopsouza/balance/internal/platform/adapters/balance"
+	webserver "github.com/fabiopsouza/balance/internal/platform/web"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -24,10 +25,18 @@ func main() {
 		"group.id":          "fcutils",
 	}
 
-	balanceRepository := balanceAdapter.NewMySqlClient(db)
+	balanceRepository := balanceOutboundAdapter.NewMySqlClient(db)
 
-	balanceUseCase := balance.NewUseCase(balanceRepository)
+	balanceUseCase := balanceUseCase.NewUseCase(balanceRepository)
 
 	balanceConsumer := kafka.NewConsumer(&configMap, []string{"balance"})
 	balanceConsumer.Consume(balanceUseCase.Save)
+
+	balanceHandler := balance.NewHandler(balanceUseCase)
+
+	webserver := webserver.NewWebServer(":3003")
+	webserver.AddHandler("/balances/:accountID", balanceHandler.List)
+
+	fmt.Println("Server is running")
+	webserver.Start()
 }
