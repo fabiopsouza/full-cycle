@@ -16,14 +16,21 @@ func NewMySqlClient(db *sql.DB) balancePort.Repository {
 	}
 }
 
-func (c *MySqlClient) List() ([]balance.Model, error) {
-	rows, err := c.DB.Query("SELECT account_id_from, account_id_to, balance_account_id_from, balance_account_id_to FROM balances")
+func (c *MySqlClient) List(accountID string) ([]balance.Model, error) {
+	query := "SELECT account_id_from, account_id_to, balance_account_id_from, balance_account_id_to FROM balances where account_id_from = ? OR account_id_to = ?"
+	stmt, err := c.DB.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(accountID, accountID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var balances []balance.Model
+	balances := make([]balance.Model, 0)
 	for rows.Next() {
 		var (
 			accountIDFrom        string
@@ -47,7 +54,7 @@ func (c *MySqlClient) List() ([]balance.Model, error) {
 }
 
 func (c *MySqlClient) Save(payload balance.UpdateEventPayload) error {
-	query := `INSERT INTO balances (account_id_from, account_id_to, balance_account_id_from, balance_account_id_to) VALUES (?, ?, ?, ?)`
+	query := "INSERT INTO balances (account_id_from, account_id_to, balance_account_id_from, balance_account_id_to) VALUES (?, ?, ?, ?)"
 	stmt, err := c.DB.Prepare(query)
 	if err != nil {
 		return err

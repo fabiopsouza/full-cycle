@@ -27,7 +27,7 @@ func (h *WebHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := h.UseCase.List()
+	output, err := h.UseCase.List(accountID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println(err)

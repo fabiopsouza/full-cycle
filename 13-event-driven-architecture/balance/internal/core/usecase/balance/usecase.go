@@ -17,8 +17,8 @@ func NewUseCase(repository balancePort.Repository) balancePort.UseCase {
 	}
 }
 
-func (h UseCaseHandler) List() ([]balance.Model, error) {
-	return h.repository.List()
+func (h UseCaseHandler) List(accountID string) ([]balance.Model, error) {
+	return h.repository.List(accountID)
 }
 
 func (h UseCaseHandler) Save(msg []byte) error {

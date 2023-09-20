@@ -9,7 +9,6 @@ import (
 	balanceOutboundAdapter "github.com/fabiopsouza/balance/internal/platform/adapters/outbound/balance"
 	"github.com/fabiopsouza/balance/internal/platform/kafka"
 	webserver "github.com/fabiopsouza/balance/internal/platform/web"
-
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -26,16 +25,15 @@ func main() {
 	}
 
 	balanceRepository := balanceOutboundAdapter.NewMySqlClient(db)
-
 	balanceUseCase := balanceUseCase.NewUseCase(balanceRepository)
 
 	balanceConsumer := kafka.NewConsumer(&configMap, []string{"balance"})
-	balanceConsumer.Consume(balanceUseCase.Save)
+	go balanceConsumer.Consume(balanceUseCase.Save)
 
 	balanceHandler := balance.NewHandler(balanceUseCase)
 
 	webserver := webserver.NewWebServer(":3003")
-	webserver.AddHandler("/balances/:accountID", balanceHandler.List)
+	webserver.AddHandler("/balances/{accountID}", balanceHandler.List)
 
 	fmt.Println("Server is running")
 	webserver.Start()

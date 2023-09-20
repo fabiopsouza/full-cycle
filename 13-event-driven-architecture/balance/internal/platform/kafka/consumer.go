@@ -3,7 +3,6 @@ package kafka
 import (
 	"fmt"
 	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
-	"time"
 )
 
 type Consumer struct {
@@ -23,29 +22,18 @@ func (c *Consumer) Consume(Handle func(value []byte) error) {
 	if err != nil {
 		panic(err)
 	}
-
 	err = consumer.SubscribeTopics(c.Topics, nil)
 	if err != nil {
 		panic(err)
 	}
-
-	run := true
-	fmt.Println("Listening for balance events...")
-	for run {
-		msg, err := consumer.ReadMessage(time.Second)
+	for {
+		msg, err := consumer.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			err = Handle(msg.Value)
 			if err != nil {
 				fmt.Printf("Error on handle event: %v\n", err)
 			}
-		} else if err.(ckafka.Error).IsFatal() {
-			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
-			run = false
 		}
-	}
-	err = consumer.Close()
-	if err != nil {
-		panic(err)
 	}
 }
