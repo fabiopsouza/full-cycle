@@ -2,6 +2,9 @@ version: '3'
 
 services:
   goapp:
+    container_name: goapp
+    networks:
+      - net
     build: fcutils
     platform: linux/amd64
     volumes:
@@ -11,6 +14,9 @@ services:
 
   mysql:
     image: mysql:5.7
+    container_name: mysql
+    networks:
+      - net
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -20,9 +26,26 @@ services:
       - "3306:3306"
     volumes:
       - ./fcutils/.docker/mysql:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  migrate:
+    image: migrate/migrate
+    container_name: migrate
+    networks:
+      - net
+    volumes:
+      - ./fcutils/migrations:/migrations
+    command: [ "-path", "/migrations", "-database",  "mysql://root:root@tcp(mysql)/wallet?charset=utf8&parseTime=True&loc=Local", "up" ]
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql-balances:
     image: mysql:5.7
+    container_name: mysql-balances
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -100,3 +123,6 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
+
+networks:
+  net:
