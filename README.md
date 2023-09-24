@@ -2,6 +2,7 @@
 
 # Index
 - [Docker](#docker)
+- [EDA - Event Driven Architecture](#EDA - Event Driven Architecture)
 
 # Docker
 
@@ -9,3 +10,9 @@ Challenge | Docker Image | Repository
 :--: | :--: | :--: 
 Go | [fabsouza/go](https://hub.docker.com/r/fabsouza/go) | [Go](https://github.com/fabiopsouza/full-cycle/tree/main/docker/go)
 Nginx com Node.js | N/A | [Nginx com Node.js](https://github.com/fabiopsouza/full-cycle/tree/main/docker/nginx-node)
+
+# EDA - Event Driven Architecture
+
+Challenge | Docker Image | Repository
+:--: |:------------:| :--: 
+Balance Microservice |     N/A      | [Balance Microservice](https://github.com/fabiopsouza/full-cycle/tree/main/13-event-driven-architecture)
