@@ -29,15 +29,18 @@ func (h *WebHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	output, err := h.UseCase.List(accountID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(output)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 	w.WriteHeader(http.StatusOK)

@@ -9,8 +9,27 @@ services:
     platform: linux/amd64
     volumes:
       - ./fcutils:/app
+    command: [ "go", "run", "cmd/fcutils/main.go" ]
+    depends_on:
+      mysql:
+        condition: service_healthy
     ports:
-      - 8080:8080
+      - "8080:8080"
+
+  balance:
+    container_name: balance
+    networks:
+      - net
+    build: balance
+    platform: linux/amd64
+    volumes:
+      - ./balance:/app
+    command: [ "go", "run", "cmd/balance/main.go" ]
+    depends_on:
+      mysql-balances:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
 
   mysql:
     image: mysql:5.7
@@ -46,6 +65,8 @@ services:
   mysql-balances:
     image: mysql:5.7
     container_name: mysql-balances
+    networks:
+      - net
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -55,10 +76,28 @@ services:
       - "4000:3306"
     volumes:
       - ./balance/.docker/mysql:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  migrate-balance:
+    image: migrate/migrate
+    container_name: migrate-balance
+    networks:
+      - net
+    volumes:
+      - ./balance/migrations:/migrations
+    command: [ "-path", "/migrations", "-database",  "mysql://root:root@tcp(mysql-balances)/balances?charset=utf8&parseTime=True&loc=Local", "up" ]
+    depends_on:
+      mysql-balances:
+        condition: service_healthy
 
   zookeeper:
     image: "confluentinc/cp-zookeeper:6.1.0"
     container_name: zookeeper
+    networks:
+      - net
     ports:
       - 2181:2181
     environment:
@@ -69,6 +108,8 @@ services:
   kafka:
     image: "confluentinc/cp-enterprise-kafka:6.1.0"
     container_name: kafka
+    networks:
+      - net
     depends_on:
       - zookeeper
     ports:
@@ -112,6 +153,8 @@ services:
     image: confluentinc/cp-enterprise-control-center:7.3.0
     hostname: control-center
     container_name: control-center
+    networks:
+      - net
     depends_on:
       - kafka
     ports:
