@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/14-api-gateway/FC3-admin-catalogo-de-videos-api-gateway" vcs="Git" />
   </component>
 </project>
