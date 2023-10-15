@@ -8,6 +8,7 @@ services:
       - .:/go/src/
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+      - "storage.googleapis.com:74.125.136.207"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
