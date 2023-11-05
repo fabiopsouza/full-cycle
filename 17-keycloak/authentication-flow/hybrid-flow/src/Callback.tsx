@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 
 export function Callback() {
-  const { hash } = useLocation(); // hash field: O que vem depois de # na URL
+  const { hash } = useLocation();
   const { login, auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -17,12 +17,13 @@ export function Callback() {
     const accessToken = searchParams.get("access_token") as string;
     const idToken = searchParams.get("id_token") as string;
     const state = searchParams.get("state") as string;
+    const code = searchParams.get("code") as string;
 
     if (!accessToken || !idToken || !state) {
       navigate("/login");
     }
 
-    login(accessToken, idToken, state);
+    login(accessToken, idToken, code, state);
 
   }, [hash, login, auth, navigate]);
 
